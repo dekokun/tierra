@@ -1,6 +1,6 @@
 extern crate cfg_if;
-extern crate wasm_bindgen;
 extern crate js_sys;
+extern crate wasm_bindgen;
 extern crate web_sys;
 
 mod utils;
@@ -39,25 +39,24 @@ pub struct Universe {
 
 #[wasm_bindgen]
 impl Universe {
-  pub fn new() -> Universe {
-    log!("universe start!");
-    let size = 64;
+    pub fn new() -> Universe {
+        log!("universe start!");
+        let size = 64;
 
-    let cells = (0..size).map(|_| {
-      if js_sys::Math::random() < 0.5 {
-        Cell::Alive
-      } else {
-        Cell::Dead
-      }
-    }).collect();
-    Universe {
-      cells,
+        let cells = (0..size)
+            .map(|_| {
+                if js_sys::Math::random() < 0.5 {
+                    Cell::Alive
+                } else {
+                    Cell::Dead
+                }
+            })
+            .collect();
+        Universe { cells }
     }
-  }
-  pub fn render(&self) -> String {
-    self.to_string()
-  }
-
+    pub fn render(&self) -> String {
+        self.to_string()
+    }
 }
 
 use std::fmt;
