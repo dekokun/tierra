@@ -1,7 +1,7 @@
 [package]
 name = "tierra"
 version = "0.1.0"
-authors = ["dekokun <dekokun@hatena.ne.jp>"]
+authors = ["dekokun <shintaro.kurachi@gmail.com>"]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
