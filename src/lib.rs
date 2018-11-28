@@ -57,6 +57,18 @@ impl Universe {
     pub fn render(&self) -> String {
         self.to_string()
     }
+    pub fn tick(&mut self) {
+        let cells = (0..self.cells.len())
+            .map(|_| {
+                if js_sys::Math::random() < 0.5 {
+                    Cell::Alive
+                } else {
+                    Cell::Dead
+                }
+            })
+            .collect();
+        self.cells = cells;
+    }
 }
 
 use std::fmt;
