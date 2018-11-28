@@ -1,6 +1,7 @@
 extern crate cfg_if;
 extern crate wasm_bindgen;
 extern crate js_sys;
+extern crate web_sys;
 
 mod utils;
 
@@ -14,6 +15,12 @@ cfg_if! {
         extern crate wee_alloc;
         #[global_allocator]
         static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+    }
+}
+
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
     }
 }
 
@@ -33,6 +40,7 @@ pub struct Universe {
 #[wasm_bindgen]
 impl Universe {
   pub fn new() -> Universe {
+    log!("universe start!");
     let size = 64;
 
     let cells = (0..size).map(|_| {
