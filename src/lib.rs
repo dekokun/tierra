@@ -1,5 +1,6 @@
 extern crate cfg_if;
 extern crate wasm_bindgen;
+extern crate js_sys;
 
 mod utils;
 
@@ -17,11 +18,48 @@ cfg_if! {
 }
 
 #[wasm_bindgen]
-extern {
-    fn alert(s: &str);
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Cell {
+    Dead = 0,
+    Alive = 1,
 }
 
 #[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, tierra!");
+pub struct Universe {
+    cells: Vec<Cell>,
+}
+
+#[wasm_bindgen]
+impl Universe {
+  pub fn new() -> Universe {
+    let size = 64;
+
+    let cells = (0..size).map(|_| {
+      if js_sys::Math::random() < 0.5 {
+        Cell::Alive
+      } else {
+        Cell::Dead
+      }
+    }).collect();
+    Universe {
+      cells,
+    }
+  }
+  pub fn render(&self) -> String {
+    self.to_string()
+  }
+
+}
+
+use std::fmt;
+impl fmt::Display for Universe {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        for cell in &self.cells {
+            let symbol = if *cell == Cell::Dead { '◻' } else { '◼' };
+            write!(f, "{}", symbol)?;
+        }
+
+        Ok(())
+    }
 }
