@@ -48,6 +48,8 @@ impl Cell {
 #[wasm_bindgen]
 pub struct Universe {
     cells: Vec<Cell>,
+    now_cell_idx: usize,
+    length: usize,
 }
 
 #[wasm_bindgen]
@@ -58,22 +60,26 @@ impl Universe {
 
         let mut cells = vec![Cell::Dead; size];
         cells[0] = Cell::Alive;
-        Universe { cells }
+        Universe {
+            cells:cells,
+            now_cell_idx:0,
+            length:size
+        }
     }
     pub fn render(&self) -> String {
         self.to_string()
     }
     pub fn tick(&mut self) {
-        let mut new_cells = vec![];
-        let cells = self.cells.clone();
-        for cell in &cells {
-            match cell.tick() {
-                None => continue,
-                Some(cell) => new_cells.push(cell),
+            self.now_cell_idx += 1;
+            if self.now_cell_idx >= self.length {
+                self.now_cell_idx = 0;
             }
+            let new_cell = match self.cells[self.now_cell_idx].tick() {
+                None => return,
+                Some(cell) => cell,
+            };
             let idx = self.first_dead_cell().unwrap();
-            self.cells[idx] = *cell;
-        }
+            self.cells[idx] = new_cell;
     }
 }
 
