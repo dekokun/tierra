@@ -32,6 +32,19 @@ pub enum Cell {
     Alive = 1,
 }
 
+impl Cell {
+    pub fn tick(&self) -> Option<Cell> {
+        if *self == Cell::Dead {
+            return None
+        }
+        if js_sys::Math::random() < 0.5 {
+            Some(Cell::Alive)
+        } else {
+            None
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub struct Universe {
     cells: Vec<Cell>,
@@ -43,31 +56,35 @@ impl Universe {
         log!("universe start!");
         let size = 64;
 
-        let cells = (0..size)
-            .map(|_| {
-                if js_sys::Math::random() < 0.5 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
-                }
-            })
-            .collect();
+        let mut cells = vec![Cell::Dead; size];
+        cells[0] = Cell::Alive;
         Universe { cells }
     }
     pub fn render(&self) -> String {
         self.to_string()
     }
     pub fn tick(&mut self) {
-        let cells = (0..self.cells.len())
-            .map(|_| {
-                if js_sys::Math::random() < 0.5 {
-                    Cell::Alive
-                } else {
-                    Cell::Dead
-                }
-            })
-            .collect();
-        self.cells = cells;
+        let mut new_cells = vec![];
+        let cells = self.cells.clone();
+        for cell in &cells {
+            match cell.tick() {
+                None => continue,
+                Some(cell) => new_cells.push(cell),
+            }
+            let idx = self.first_dead_cell().unwrap();
+            self.cells[idx] = *cell;
+        }
+    }
+}
+
+impl Universe {
+    fn first_dead_cell(&self) -> Option<usize> {
+        for (idx, cell) in self.cells.iter().enumerate() {
+            if *cell == Cell::Dead {
+                return Some(idx);
+            }
+        }
+        return None;
     }
 }
 
