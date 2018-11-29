@@ -35,7 +35,7 @@ pub enum Cell {
 impl Cell {
     pub fn tick(&self) -> Option<Cell> {
         if *self == Cell::Dead {
-            return None
+            return None;
         }
         if js_sys::Math::random() < 0.5 {
             Some(Cell::Alive)
@@ -61,25 +61,25 @@ impl Universe {
         let mut cells = vec![Cell::Dead; size];
         cells[0] = Cell::Alive;
         Universe {
-            cells:cells,
-            now_cell_idx:0,
-            length:size
+            cells: cells,
+            now_cell_idx: 0,
+            length: size,
         }
     }
     pub fn render(&self) -> String {
         self.to_string()
     }
     pub fn tick(&mut self) {
-            self.now_cell_idx += 1;
-            if self.now_cell_idx >= self.length {
-                self.now_cell_idx = 0;
-            }
-            let new_cell = match self.cells[self.now_cell_idx].tick() {
-                None => return,
-                Some(cell) => cell,
-            };
-            let idx = self.first_dead_cell().unwrap();
-            self.cells[idx] = new_cell;
+        self.now_cell_idx += 1;
+        if self.now_cell_idx >= self.length {
+            self.now_cell_idx = 0;
+        }
+        let new_cell = match self.cells[self.now_cell_idx].tick() {
+            None => return,
+            Some(cell) => cell,
+        };
+        let idx = self.first_dead_cell().unwrap();
+        self.cells[idx] = new_cell;
     }
 }
 
