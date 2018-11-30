@@ -90,6 +90,9 @@ impl Universe {
         };
         self.cells[idx] = new_cell;
     }
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
+    }
 }
 
 impl Universe {

@@ -1,5 +1,6 @@
 import { Universe, Cell } from "tierra";
 const CELL_SIZE = 5; // px
+import { memory } from "tierra/tierra_bg";
 const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
@@ -15,11 +16,12 @@ const getPosition = (idx) => {
 };
 
 const drawCells = () => {
-  const cells = JSON.parse(universe.render_json()).cells;
+  const cellsPtr = universe.cells();
+  const cells = new Uint8Array(memory.buffer, cellsPtr, length);
   ctx.beginPath();
   cells.forEach((cell, idx) => {
     let [row, col] = getPosition(idx);
-    ctx.fillStyle = cell === "Dead"
+    ctx.fillStyle = cell === Cell.Dead
       ? DEAD_COLOR
       : ALIVE_COLOR;
     ctx.fillRect(
