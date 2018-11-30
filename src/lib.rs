@@ -1,5 +1,7 @@
 extern crate cfg_if;
 extern crate js_sys;
+#[macro_use]
+extern crate serde_derive;
 extern crate wasm_bindgen;
 extern crate web_sys;
 
@@ -26,7 +28,7 @@ macro_rules! log {
 
 #[wasm_bindgen]
 #[repr(u8)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
 pub enum Cell {
     Dead = 0,
     Alive = 1,
@@ -46,6 +48,7 @@ impl Cell {
 }
 
 #[wasm_bindgen]
+#[derive(Serialize)]
 pub struct Universe {
     cells: Vec<Cell>,
     now_cell_idx: usize,
@@ -56,7 +59,7 @@ pub struct Universe {
 impl Universe {
     pub fn new() -> Universe {
         log!("universe start!");
-        let size = 64;
+        let size = 1000;
 
         let mut cells = vec![Cell::Dead; size];
         cells[0] = Cell::Alive;
@@ -66,8 +69,11 @@ impl Universe {
             length: size,
         }
     }
-    pub fn render(&self) -> String {
-        self.to_string()
+    pub fn length(&self) -> usize {
+        self.length
+    }
+    pub fn render_json(&self) -> String {
+        serde_json::to_string(&self).unwrap()
     }
     pub fn tick(&mut self) {
         self.now_cell_idx += 1;
