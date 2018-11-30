@@ -84,7 +84,10 @@ impl Universe {
             None => return,
             Some(cell) => cell,
         };
-        let idx = self.first_dead_cell().unwrap();
+        let idx = match self.first_dead_cell() {
+            None => return,
+            Some(idx) => idx,
+        };
         self.cells[idx] = new_cell;
     }
 }
