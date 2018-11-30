@@ -59,7 +59,7 @@ pub struct Universe {
 impl Universe {
     pub fn new() -> Universe {
         log!("universe start!");
-        let size = 1000;
+        let size = 10000;
 
         let mut cells = vec![Cell::Dead; size];
         cells[0] = Cell::Alive;

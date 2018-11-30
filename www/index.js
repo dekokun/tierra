@@ -1,6 +1,6 @@
 import { Universe, Cell } from "tierra";
-const CELL_SIZE = 5; // px
 import { memory } from "tierra/tierra_bg";
+const CELL_SIZE = 2; // px
 const GRID_COLOR = "#CCCCCC";
 const DEAD_COLOR = "#FFFFFF";
 const ALIVE_COLOR = "#000000";
@@ -8,7 +8,7 @@ const ALIVE_COLOR = "#000000";
 const canvas = document.getElementById("universe");
 const universe = Universe.new();
 const length = universe.length();
-const width = 256;
+const width = 200;
 const ctx = canvas.getContext('2d');
 
 const getPosition = (idx) => {
