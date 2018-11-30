@@ -19,7 +19,7 @@ const drawCells = () => {
   ctx.beginPath();
   cells.forEach((cell, idx) => {
     let [row, col] = getPosition(idx);
-    ctx.fillStyle = cells[idx] === "Dead"
+    ctx.fillStyle = cell === "Dead"
       ? DEAD_COLOR
       : ALIVE_COLOR;
     ctx.fillRect(
