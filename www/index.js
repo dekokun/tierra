@@ -16,10 +16,10 @@ const getPosition = (idx) => {
 };
 
 const drawCells = () => {
-  const cellsPtr = universe.cells();
-  const cells = new Uint8Array(memory.buffer, cellsPtr, length);
+  const soupPtr = universe.soup_ptr();
+  const soup = new Uint8Array(memory.buffer, soupPtr, length);
   ctx.beginPath();
-  cells.forEach((cell, idx) => {
+  soup.forEach((cell, idx) => {
     let [row, col] = getPosition(idx);
     ctx.fillStyle = cell === Cell.Dead
       ? DEAD_COLOR

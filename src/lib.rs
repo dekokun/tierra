@@ -27,14 +27,17 @@ macro_rules! log {
 }
 
 #[wasm_bindgen]
-#[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
-pub enum Cell {
-    Dead = 0,
-    Alive = 1,
+pub struct Cpu {
+    program_counter: usize,
+    head: usize,
+    tail: usize,
 }
 
-enum Instruction {
+#[wasm_bindgen]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+pub enum Instruction {
     Adr,
     Adrb,
     Adrf,
@@ -69,15 +72,17 @@ enum Instruction {
     Zero,
 }
 
-impl Cell {
-    pub fn tick(&self) -> Option<Cell> {
-        if *self == Cell::Dead {
-            return None;
+impl Cpu {
+    pub fn tick(&mut self, soup: &Vec<Option<Instruction>>) {
+        match soup[self.program_counter] {
+            Some(Instruction::Nop0) => log!("nop0"),
+            Some(Instruction::Nop1) => log!("nop1"),
+            Some(inst) => log!("{:?}", inst),
+            _ => log!("nothing"),
         }
-        if js_sys::Math::random() < 0.5 {
-            Some(Cell::Alive)
-        } else {
-            None
+        self.program_counter += 1;
+        if self.program_counter > self.tail {
+            self.program_counter = self.head;
         }
     }
 }
@@ -85,8 +90,9 @@ impl Cell {
 #[wasm_bindgen]
 #[derive(Serialize)]
 pub struct Universe {
-    cells: Vec<Cell>,
-    now_cell_idx: usize,
+    soup: Vec<Option<Instruction>>,
+    cpus: Vec<Cpu>,
+    now_cpu_idx: usize,
     length: usize,
 }
 
@@ -96,11 +102,23 @@ impl Universe {
         log!("universe start!");
         let size = 10000;
 
-        let mut cells = vec![Cell::Dead; size];
-        cells[0] = Cell::Alive;
+        let mut soup = vec![None; size];
+        let first_instruction_index = 0;
+        let second_instruction_index = 1;
+        let third_instruction_index = 2;
+        soup[first_instruction_index] = Some(Instruction::Nop0);
+        soup[second_instruction_index] = Some(Instruction::Nop1);
+        soup[third_instruction_index] = Some(Instruction::Divide);
+
+        let cpus = vec![Cpu {
+            program_counter: 0,
+            head: first_instruction_index,
+            tail: third_instruction_index,
+        }];
         Universe {
-            cells: cells,
-            now_cell_idx: 0,
+            soup: soup,
+            cpus: cpus,
+            now_cpu_idx: 0,
             length: size,
         }
     }
@@ -111,44 +129,16 @@ impl Universe {
         serde_json::to_string(&self).unwrap()
     }
     pub fn tick(&mut self) {
-        self.now_cell_idx += 1;
-        if self.now_cell_idx >= self.length {
-            self.now_cell_idx = 0;
+        self.now_cpu_idx += 1;
+        if self.now_cpu_idx >= self.cpus.len() {
+            self.now_cpu_idx = 0;
         }
-        let new_cell = match self.cells[self.now_cell_idx].tick() {
-            None => return,
-            Some(cell) => cell,
-        };
-        let idx = match self.first_dead_cell() {
-            None => return,
-            Some(idx) => idx,
-        };
-        self.cells[idx] = new_cell;
+        self.cpus[self.now_cpu_idx].tick(&self.soup);
     }
-    pub fn cells(&self) -> *const Cell {
-        self.cells.as_ptr()
+    pub fn cpus_ptr(&self) -> *const Cpu {
+        self.cpus.as_ptr()
     }
-}
-
-impl Universe {
-    fn first_dead_cell(&self) -> Option<usize> {
-        for (idx, cell) in self.cells.iter().enumerate() {
-            if *cell == Cell::Dead {
-                return Some(idx);
-            }
-        }
-        return None;
-    }
-}
-
-use std::fmt;
-impl fmt::Display for Universe {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        for cell in &self.cells {
-            let symbol = if *cell == Cell::Dead { '◻' } else { '◼' };
-            write!(f, "{}", symbol)?;
-        }
-
-        Ok(())
+    pub fn soup_ptr(&self) -> *const Option<Instruction> {
+        self.soup.as_ptr()
     }
 }
