@@ -34,6 +34,41 @@ pub enum Cell {
     Alive = 1,
 }
 
+enum Instruction {
+    Adr,
+    Adrb,
+    Adrf,
+    Call,
+    DecC,
+    Divide,
+    IfCz,
+    IncA,
+    IncB,
+    IncC,
+    Jmp,
+    JumpB,
+    Mal,
+    MovAb,
+    MovCd,
+    MovIab,
+    Nop0,
+    Nop1,
+    Or1,
+    PopAx,
+    PopBx,
+    PopCx,
+    PopDx,
+    PushAx,
+    PushBx,
+    PushCx,
+    PushDx,
+    Ret,
+    Sh1,
+    SubAb,
+    SubAc,
+    Zero,
+}
+
 impl Cell {
     pub fn tick(&self) -> Option<Cell> {
         if *self == Cell::Dead {
