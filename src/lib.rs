@@ -73,13 +73,29 @@ pub enum Instruction {
 }
 
 impl Cpu {
-    pub fn tick(&mut self, soup: &Vec<Option<Instruction>>) {
+    pub fn new(head: usize, tail: usize) -> Cpu {
+        Cpu {
+            program_counter: 0,
+            head: head,
+            tail: tail,
+        }
+    }
+    pub fn tick(&mut self, soup: &Vec<Option<Instruction>>) -> bool {
         match soup[self.program_counter] {
             Some(Instruction::Nop0) => log!("nop0"),
             Some(Instruction::Nop1) => log!("nop1"),
+            Some(Instruction::Divide) => {
+                log!("divide");
+                self.inc_counter();
+                return true;
+            }
             Some(inst) => log!("{:?}", inst),
             _ => log!("nothing"),
         }
+        self.inc_counter();
+        return false;
+    }
+    fn inc_counter(&mut self) {
         self.program_counter += 1;
         if self.program_counter > self.tail {
             self.program_counter = self.head;
@@ -133,12 +149,31 @@ impl Universe {
         if self.now_cpu_idx >= self.cpus.len() {
             self.now_cpu_idx = 0;
         }
-        self.cpus[self.now_cpu_idx].tick(&self.soup);
+        if self.cpus[self.now_cpu_idx].tick(&self.soup) {
+            let cell = self.cpus[self.now_cpu_idx];
+            let idx = self.first_dead_soup().unwrap();
+            log!("{}", idx);
+            for n in 0..(cell.tail - cell.head + 1) {
+                self.soup[idx + n] = self.soup[cell.head + n];
+            }
+            self.cpus.push(Cpu::new(idx, idx + cell.tail - cell.head));
+        }
     }
     pub fn cpus_ptr(&self) -> *const Cpu {
         self.cpus.as_ptr()
     }
     pub fn soup_ptr(&self) -> *const Option<Instruction> {
         self.soup.as_ptr()
+    }
+}
+
+impl Universe {
+    fn first_dead_soup(&self) -> Option<usize> {
+        for (idx, instruction) in self.soup.iter().enumerate() {
+            if *instruction == None {
+                return Some(idx);
+            }
+        }
+        return None;
     }
 }
