@@ -152,7 +152,6 @@ impl Universe {
         if self.cpus[self.now_cpu_idx].tick(&self.soup) {
             let cell = self.cpus[self.now_cpu_idx];
             let idx = self.first_dead_soup().unwrap();
-            log!("{}", idx);
             for n in 0..(cell.tail - cell.head + 1) {
                 self.soup[idx + n] = self.soup[cell.head + n];
             }
