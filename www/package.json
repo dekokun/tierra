@@ -7,7 +7,7 @@
     "create-wasm-app": ".bin/create-wasm-app.js"
   },
   "scripts": {
-    "build": "$(npm bin)/webpack --config webpack.config.js",
+    "build": "$(npm bin)/webpack --config webpack.config.js --mode production",
     "start": "$(npm bin)/webpack-dev-server"
   },
   "repository": {
