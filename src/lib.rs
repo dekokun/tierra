@@ -80,7 +80,7 @@ impl Cpu {
             tail: tail,
         }
     }
-    pub fn tick(&mut self, soup: &Vec<Option<Instruction>>) -> bool {
+    pub fn tick(&mut self, soup: &[Option<Instruction>]) -> bool {
         match soup[self.program_counter] {
             Some(Instruction::Nop0) => log!("nop0"),
             Some(Instruction::Nop1) => log!("nop1"),
@@ -93,7 +93,7 @@ impl Cpu {
             _ => log!("nothing"),
         }
         self.inc_counter();
-        return false;
+        false
     }
     fn inc_counter(&mut self) {
         self.program_counter += 1;
@@ -104,7 +104,7 @@ impl Cpu {
 }
 
 #[wasm_bindgen]
-#[derive(Serialize)]
+#[derive(Serialize, Default)]
 pub struct Universe {
     soup: Vec<Option<Instruction>>,
     cpus: Vec<Cpu>,
@@ -152,7 +152,7 @@ impl Universe {
         if self.cpus[self.now_cpu_idx].tick(&self.soup) {
             let cell = self.cpus[self.now_cpu_idx];
             let idx = self.first_dead_soup().unwrap();
-            for n in 0..(cell.tail - cell.head + 1) {
+            for n in 0..=cell.tail - cell.head {
                 self.soup[idx + n] = self.soup[cell.head + n];
             }
             self.cpus.push(Cpu::new(idx, idx + cell.tail - cell.head));
@@ -173,6 +173,6 @@ impl Universe {
                 return Some(idx);
             }
         }
-        return None;
+        None
     }
 }
