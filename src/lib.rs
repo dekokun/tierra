@@ -1,9 +1,7 @@
 extern crate cfg_if;
-extern crate js_sys;
 #[macro_use]
 extern crate serde_derive;
 extern crate wasm_bindgen;
-extern crate web_sys;
 
 mod utils;
 
