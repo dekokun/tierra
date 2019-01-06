@@ -7,6 +7,7 @@ mod utils;
 
 use cfg_if::cfg_if;
 use wasm_bindgen::prelude::*;
+use std::collections::VecDeque;
 
 cfg_if! {
     // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
@@ -100,6 +101,9 @@ impl Cpu {
     }
 }
 
+#[derive(Serialize)]
+struct CpuIdx(usize);
+
 #[wasm_bindgen]
 #[derive(Serialize, Default)]
 pub struct Universe {
@@ -107,6 +111,7 @@ pub struct Universe {
     cpus: Vec<Cpu>,
     now_cpu_idx: usize,
     length: usize,
+    reaper_queue: VecDeque<CpuIdx>,
 }
 
 #[wasm_bindgen]
@@ -133,6 +138,7 @@ impl Universe {
             cpus: cpus,
             now_cpu_idx: 0,
             length: size,
+            reaper_queue: VecDeque::from(vec![CpuIdx(0)]),
         }
     }
     pub fn length(&self) -> usize {
@@ -153,6 +159,7 @@ impl Universe {
                 self.soup[idx + n] = self.soup[cell.head + n];
             }
             self.cpus.push(Cpu::new(idx, idx + cell.tail - cell.head));
+            self.reaper_queue.push_back(CpuIdx(self.cpus.len()));
         }
     }
     pub fn cpus_ptr(&self) -> *const Cpu {
