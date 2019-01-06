@@ -74,8 +74,8 @@ impl Cpu {
     pub fn new(head: usize, tail: usize) -> Cpu {
         Cpu {
             program_counter: 0,
-            head: head,
-            tail: tail,
+            head,
+            tail,
         }
     }
     pub fn tick(&mut self, soup: &[Option<Instruction>]) -> bool {
@@ -134,8 +134,8 @@ impl Universe {
             tail: third_instruction_index,
         }];
         Universe {
-            soup: soup,
-            cpus: cpus,
+            soup,
+            cpus,
             now_cpu_idx: 0,
             length: size,
             reaper_queue: VecDeque::from(vec![CpuIdx(0)]),
